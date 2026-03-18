@@ -1,5 +1,9 @@
 package com.cotefacil.gateway.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.reactive.function.client.WebClient;
 
+@Tag(name = "Proxy", description = "Roteamento autenticado para a API de Pedidos")
 @RestController
 @RequestMapping("/api")
 public class GatewayController {
@@ -25,6 +30,15 @@ public class GatewayController {
         this.webClient = webClient;
     }
 
+    @Operation(
+            summary = "Proxy para a API de Pedidos",
+            description = "Repassa a requisição autenticada para a API Orders e retorna a resposta sem modificação"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Resposta da API Orders"),
+            @ApiResponse(responseCode = "401", description = "Token JWT ausente ou inválido"),
+            @ApiResponse(responseCode = "503", description = "API Orders indisponível")
+    })
     @RequestMapping(
             value = "/orders/**",
             method = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE}
