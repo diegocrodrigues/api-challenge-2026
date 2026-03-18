@@ -24,13 +24,16 @@ public class JwtTokenValidator {
     }
 
     public boolean validateToken(String token) {
+        if (token == null || token.isBlank()) {
+            return false;
+        }
         try {
             Jwts.parser()
                     .verifyWith(secretKey)
                     .build()
                     .parseSignedClaims(token);
             return true;
-        } catch (JwtException ex) {
+        } catch (JwtException | IllegalArgumentException ex) {
             log.warn("Token JWT inválido: {}", ex.getMessage());
             return false;
         }
