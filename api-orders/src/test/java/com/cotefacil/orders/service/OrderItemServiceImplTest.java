@@ -7,6 +7,7 @@ import com.cotefacil.orders.mapper.OrderItemMapper;
 import com.cotefacil.orders.model.Order;
 import com.cotefacil.orders.model.OrderItem;
 import com.cotefacil.orders.model.OrderStatus;
+import com.cotefacil.orders.repository.OrderItemRepository;
 import com.cotefacil.orders.repository.OrderRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,6 +32,9 @@ class OrderItemServiceImplTest {
 
     @Mock
     private OrderRepository orderRepository;
+
+    @Mock
+    private OrderItemRepository orderItemRepository;
 
     @Mock
     private OrderItemMapper orderItemMapper;
@@ -78,6 +82,7 @@ class OrderItemServiceImplTest {
 
         when(orderRepository.findById(1L)).thenReturn(Optional.of(order));
         when(orderItemMapper.toEntity(any(OrderItemRequest.class))).thenReturn(novoItem);
+        when(orderItemRepository.save(novoItem)).thenReturn(novoItem);
         when(orderRepository.save(order)).thenReturn(order);
         when(orderItemMapper.toResponse(novoItem)).thenReturn(itemResponse);
 
@@ -87,6 +92,7 @@ class OrderItemServiceImplTest {
         assertEquals("Novo Produto", resultado.productName());
         assertEquals(new BigDecimal("25.00"), order.getTotalAmount());
         assertEquals(1, order.getItems().size());
+        verify(orderItemRepository).save(novoItem);
         verify(orderRepository).save(order);
     }
 
@@ -101,6 +107,7 @@ class OrderItemServiceImplTest {
 
         when(orderRepository.findById(1L)).thenReturn(Optional.of(order));
         when(orderItemMapper.toEntity(any(OrderItemRequest.class))).thenReturn(novoItem);
+        when(orderItemRepository.save(novoItem)).thenReturn(novoItem);
         when(orderRepository.save(order)).thenReturn(order);
         when(orderItemMapper.toResponse(novoItem)).thenReturn(itemResponse);
 

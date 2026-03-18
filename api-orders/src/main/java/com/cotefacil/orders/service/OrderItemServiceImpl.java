@@ -6,6 +6,7 @@ import com.cotefacil.orders.exception.OrderNotFoundException;
 import com.cotefacil.orders.mapper.OrderItemMapper;
 import com.cotefacil.orders.model.Order;
 import com.cotefacil.orders.model.OrderItem;
+import com.cotefacil.orders.repository.OrderItemRepository;
 import com.cotefacil.orders.repository.OrderRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,11 +22,14 @@ public class OrderItemServiceImpl implements IOrderItemService {
     private static final Logger log = LoggerFactory.getLogger(OrderItemServiceImpl.class);
 
     private final OrderRepository orderRepository;
+    private final OrderItemRepository orderItemRepository;
     private final OrderItemMapper orderItemMapper;
 
     public OrderItemServiceImpl(OrderRepository orderRepository,
+                                OrderItemRepository orderItemRepository,
                                 OrderItemMapper orderItemMapper) {
         this.orderRepository = orderRepository;
+        this.orderItemRepository = orderItemRepository;
         this.orderItemMapper = orderItemMapper;
     }
 
@@ -47,12 +51,13 @@ public class OrderItemServiceImpl implements IOrderItemService {
 
         OrderItem item = orderItemMapper.toEntity(request);
         item.setOrder(order);
-        order.getItems().add(item);
+        OrderItem savedItem = orderItemRepository.save(item);
+        order.getItems().add(savedItem);
         order.setTotalAmount(recalcularTotal(order.getItems()));
 
         orderRepository.save(order);
         log.debug("Item adicionado ao pedido id={}", orderId);
-        return orderItemMapper.toResponse(item);
+        return orderItemMapper.toResponse(savedItem);
     }
 
     private BigDecimal recalcularTotal(List<OrderItem> items) {
